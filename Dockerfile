@@ -61,7 +61,8 @@ ENV TF_SET_ANDROID_WORKSPACE=0
 ENV CLANG_COMPILER_PATH=/usr/bin/clang-18
 ENV TF_CXX_FLAGS="-Wno-unsupported-gnu-property -Wno-error=unused-command-line-argument"
 
-RUN echo "build --linkopt=-Wl,--undefined-version" >> .bazelrc
+RUN echo "build --linkopt=-Wl,--undefined-version" >> .bazelrc && \
+    echo "build --define=with_xla_support=false" >> .bazelrc
 
 RUN ./configure
 

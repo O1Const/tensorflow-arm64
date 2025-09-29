@@ -49,6 +49,7 @@ Example: build TensorFlow v2.19.0 with Python 3.11 and XLA enabled:
 
 - Platform: The Dockerfile sets linux/arm64 by default. You can also use Buildx and pass --platform linux/arm64 explicitly.
 - Tagging: Image tags are up to you; the previous script auto-generated tags but that logic is better handled at the docker build command line.
+- XLA: XLA is disabled by default in this build to avoid runtime MLIR/XLA symbol issues when importing TensorFlow on arm64. If you need XLA, be aware it may cause import errors; you can experiment by removing the with_xla_support=false overrides in the Dockerfile and rebuilding.
 - Performance: The Dockerfile uses BuildKit cache mounts (with persistent ids) for pip, npm, and Bazel to speed up incremental builds and let you resume faster after errors. Ensure DOCKER_BUILDKIT=1 (Docker Desktop enables this by default).
 
 ### Resuming faster after build errors
