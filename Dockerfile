@@ -7,9 +7,9 @@ ARG TARGET_PLATFORM=linux/arm64
 ARG TENSORFLOW_VERSION=v2.19.0
 FROM --platform=${TARGET_PLATFORM:-linux/arm64} python:${PYTHON_VERSION:-3.10} AS build
 
-# TensorFlow config flags (defaults mirror previous .env)
+# TensorFlow config flags
 ARG TF_NEED_CUDA=0
-ARG TF_ENABLE_XLA=0
+ARG TF_ENABLE_XLA=1
 ARG TF_NEED_ROCM=0
 ARG TF_NEED_MPI=0
 ARG TF_NEED_OPENCL_SYCL=0
@@ -72,7 +72,7 @@ RUN sed -i '1i#include <cstdint>' third_party/xla/third_party/tsl/tsl/platform/d
 # Build TensorFlow wheel
 RUN --mount=type=cache,id=tf-bazel-cache,target=/root/.cache/bazel \
     bazel build -c opt --jobs=6 --verbose_failures \
-    --define=with_xla_support=false \
+    --define=with_xla_support=true \
     --copt=-Wno-gnu-offsetof-extensions \
     //tensorflow/tools/pip_package:wheel && \
     mkdir -p /tmp/tensorflow_pkg && \

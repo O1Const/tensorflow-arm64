@@ -31,25 +31,30 @@ The Dockerfile exposes arguments so you can customize the build directly on the 
 
 - TensorFlow config flags:
   - TF_NEED_CUDA (default 0)
-  - TF_ENABLE_XLA (default 0)
+  - TF_ENABLE_XLA (default 1)
   - TF_NEED_ROCM (default 0)
   - TF_NEED_MPI (default 0)
   - TF_NEED_OPENCL_SYCL (default 0)
   - TF_NEED_CLANG (default 1)
   - CC_OPT_FLAGS (default -march=native)
 
-Example: build TensorFlow v2.19.0 with Python 3.11 and XLA enabled:
+Example: build TensorFlow v2.19.0 with Python 3.11 (XLA enabled by default):
 
   docker build \
     --build-arg PYTHON_VERSION=3.11 \
-    --build-arg TF_ENABLE_XLA=1 \
     -t tensorflow:v2.19.0-py311-xla-arm64 .
+
+To disable XLA explicitly:
+
+  docker build \
+    --build-arg TF_ENABLE_XLA=0 \
+    -t tensorflow:v2.19.0-no-xla-arm64 .
 
 ## Notes
 
 - Platform: The Dockerfile sets linux/arm64 by default. You can also use Buildx and pass --platform linux/arm64 explicitly.
 - Tagging: Image tags are up to you; the previous script auto-generated tags but that logic is better handled at the docker build command line.
-- XLA: XLA is disabled by default in this build to avoid runtime MLIR/XLA symbol issues when importing TensorFlow on arm64. If you need XLA, be aware it may cause import errors; you can experiment by removing the with_xla_support=false overrides in the Dockerfile and rebuilding.
+- XLA: XLA is enabled by default in this build. If you encounter runtime MLIR/XLA symbol issues on arm64, you can disable it by passing `--build-arg TF_ENABLE_XLA=0` during `docker build`, which will produce a non‑XLA wheel.
 - Performance: The Dockerfile uses BuildKit cache mounts (with persistent ids) for pip, npm, and Bazel to speed up incremental builds and let you resume faster after errors. Ensure DOCKER_BUILDKIT=1 (Docker Desktop enables this by default).
 
 ### Resuming faster after build errors
